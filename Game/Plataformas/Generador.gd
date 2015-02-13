@@ -17,11 +17,16 @@ preload("res://Plataformas/PlataformaGrande.scn")
 
 var tiempoRandom=0;
 var tiempoAcumulable=0.0;
-
+var nivel
+var player
+var camara
 
 func _ready():
 	# Initalization here
 	tiempoRandom=randf()*(tiempoMaximo-tiempoMinimo)+tiempoMinimo
+	nivel=get_tree().get_root().get_child(0)
+	player=nivel.get_node("Player")
+	camara=player.get_node("Camara")
 	set_fixed_process(true)
 
 
@@ -51,7 +56,7 @@ func generarPlataforma():
 		limiteMenor=8
 		limiteMayor=17
 	
-	var indicePlataforma
+	var indicePlataforma=0
 	
 	if(definePlataforma<=limiteMenor):
 		indicePlataforma=0
@@ -62,10 +67,17 @@ func generarPlataforma():
 	else:
 		indicePlataforma=2
 	
+	
+	
 	var plataforma=Plataformas[indicePlataforma].instance()
-	var pos =get_pos()+get_node("posicionPlataforma").get_pos()
+	var posPlayer=player.get_pos()
+	var posCamara=camara.get_pos()
+	var pos =posPlayer+posCamara+get_pos()+get_node("posicionPlataforma").get_pos()
+	pos.y-=posPlayer.y
+	pos.y+=240
 	plataforma.set_pos(pos)
-	get_parent().add_child(plataforma)
+	nivel.add_child(plataforma)
+	#print("indice: ",indicePlataforma,"posicion: ",pos)
 	
 	
 	

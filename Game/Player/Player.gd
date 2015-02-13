@@ -13,19 +13,38 @@ var presionJump=false
 var choque=500.0
 var step
 var validaNoPiso=500.0
+var touchPress=false
+
+
+var anim=""
+var nuevaAnim=""
+
+
 
 func _ready():
 	# Initalization here
+	set_process_input(true)
 	pass
 
+	
+func _input(ev):
+	if (ev.type==InputEvent.SCREEN_TOUCH):
+		touchPress=true
+
 func _integrate_forces(s):
+	
+	
+	nuevaAnim=anim
+	
 	
 	
 	var lv = s.get_linear_velocity()
 	
 	step=s.get_step()
 	
-	var jump=Input.is_action_pressed("jump")
+	var jump=Input.is_action_pressed("jump")||touchPress
+	
+	touchPress=false
 	
 	if((!saltando or !dobleSaltando )and jump and !presionJump):
 		if(!saltando):
@@ -49,13 +68,27 @@ func _integrate_forces(s):
 			saltando=false
 			dobleSaltando=false
 			piso=x
-	print("saltando", saltando)
-	print("dobleSaltando", dobleSaltando)
+	
 	
 	if choque>= 0.3 :
 		choque=0.0
 		s.set_linear_velocity(Vector2(vel.x,lv.y))
 	else:
 		choque+=step
+		
+	if(saltando || dobleSaltando):
+		anim="Saltando"
+		
+	else:
+		anim="Corriendo"
+		
+	
+	if(lv.y>5):
+		anim="Quieto"
+	
+	
+	if(anim!=nuevaAnim):
+		get_node("Anim").play(anim)
+	
 	presionJump=jump
 	
